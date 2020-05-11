@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+<script>
+  fetch('./build/optimized.wasm')
+    .then(response =>response.arrayBuffer())
+    .then(buffer => WebAssembly.compile(buffer))
+    .then(mod => {
+      imports = {}
+      imports.env = {}
+      imports.env.memoryBase = 0
+      new WebAssembly.Memory({ initial: 256 })
+      imports.env.tableBase = 0
+      new WebAssembly.Table({ initial: 0, element: 'anyfunc' })
+      const instance = new WebAssembly.Instance(module, imports);
+      console.log(instance.exports._f(50))
+    });
+</script>
+</body>
+</html>
